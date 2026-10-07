@@ -1,0 +1,12 @@
+Metadata-Version: 2.4
+Name: paperverse-api
+Version: 0.1.0
+Requires-Python: >=3.11
+Requires-Dist: fastapi<1,>=0.115
+Requires-Dist: uvicorn[standard]<1,>=0.30
+Requires-Dist: python-multipart>=0.0.9
+Requires-Dist: pydantic<3,>=2.8
+Requires-Dist: pymupdf>=1.24
+Requires-Dist: sympy>=1.13
+Requires-Dist: celery[redis]<6,>=5.4
+Requires-Dist: genanki>=0.13

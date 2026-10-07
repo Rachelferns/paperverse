@@ -1,0 +1,43 @@
+.extracted-equations{margin-top:12px}
+.extracted-equation{padding:14px;border-bottom:1px solid #252833;display:flex;flex-direction:column;gap:8px}
+.extracted-equation:last-child{border-bottom:0}
+.extracted-index{font:8px var(--mono);letter-spacing:.6px;color:#a39afa}
+.extracted-equation code{color:#d3cafa;font:11px/1.7 var(--mono);white-space:pre-wrap;overflow-wrap:anywhere}
+.extracted-equation small,.no-equations{font-size:8px;line-height:1.6;color:#868a98}
+.no-equations{padding:14px;margin:0}
+.paper-diagram{height:290px;padding:12px;display:block}
+.paper-diagram .mermaid-preview{max-height:100%;border:0;padding:0}
+.paper-diagram .mermaid-preview svg{min-width:100%;}
+.artifact-empty{margin-top:15px;min-height:135px;border:1px dashed #303442;border-radius:6px;background:#0d1016;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:18px;text-align:center;color:#888d9c}
+.artifact-empty>svg,.no-math-icon{color:#9388f0}
+.artifact-empty strong{font-size:9px;font-weight:550;color:#c9cad4}
+.artifact-empty span{max-width:245px;font-size:8px;line-height:1.55;color:#818594}
+.loading-inline{padding:10px;color:#85899a;font-size:8px}
+.original-paper pre{max-height:65vh;margin:0;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font:9px/1.75 var(--mono);color:#a6a6b0}
+.pipeline-card{max-width:520px;margin-top:28px;padding:18px;border:1px solid #343147;border-radius:8px;background:linear-gradient(145deg,#171722,#101219);box-shadow:0 14px 42px #0003}
+.pipeline-card-top{display:flex;justify-content:space-between;align-items:center;color:#aaa4d2;font:10px var(--mono);text-transform:uppercase;letter-spacing:.6px}
+.pipeline-card-top strong{color:#a99eff;font-size:12px}
+.pipeline-track,.upload-track{height:4px;border-radius:4px;overflow:hidden;background:#292735}
+.pipeline-track{margin-top:14px}
+.pipeline-track span,.upload-track span{height:100%;display:block;border-radius:4px;background:linear-gradient(90deg,#7165dc,#a597ff);transition:width .25s ease}
+.pipeline-card p{font-size:10px;color:#8c8f9c;margin:12px 0 0;line-height:1.6}
+.upload-track{width:72%;margin-top:3px}
+.upload-progress-view{min-height:100%;align-content:start}
+.outline-nav{max-height:min(40vh,360px);overflow-y:auto;overscroll-behavior:contain;padding-right:3px;scrollbar-width:thin;scrollbar-color:#343746 transparent}
+.mobile-outline-toggle{display:none}
+@media(max-width:650px){.mobile-outline-toggle{display:grid}.left-sidebar{display:flex;position:fixed;z-index:9;left:0;top:109px;bottom:30px;width:min(290px,86vw);overflow-y:auto;box-shadow:16px 0 40px #0008}}
+.flashcard{height:190px}
+.card-answer{font-size:12px;line-height:1.55;margin-top:12px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:5;overflow:hidden;overflow-wrap:anywhere}
+.section-brief{display:flex;align-items:flex-start;gap:13px;max-width:680px;margin:26px 0;padding:20px;border:1px solid #343147;border-radius:8px;background:linear-gradient(145deg,#171722,#101219)}
+.section-brief .insight-icon{flex:0 0 28px}
+.section-brief>div{min-width:0}
+.section-brief p{margin:9px 0 0;color:#d0cfda;font-size:15px;line-height:1.75;letter-spacing:-.12px}
+.section-source{max-width:680px;border:1px solid #282b37;border-radius:7px;background:#10131a}
+.section-source summary{display:flex;align-items:center;gap:8px;padding:13px;color:#aca5ef;font-size:11px;cursor:pointer;list-style:none}
+.section-source summary::-webkit-details-marker{display:none}
+.section-source summary svg:last-child{margin-left:auto;transition:transform .2s}
+.section-source[open] summary svg:last-child{transform:rotate(180deg)}
+.section-source pre{max-height:42vh;margin:0;padding:14px;border-top:1px solid #282b37;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;color:#aeb0bc;font:10px/1.7 var(--mono)}
+.section-step-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:680px;margin:22px 0;color:#828694;font:9px var(--mono)}
+.section-step-nav button{display:flex;align-items:center;gap:5px;padding:8px 10px;border:1px solid #292d3a;border-radius:5px;background:#11141c;color:#c9c7dc;font:10px 'DM Sans',sans-serif}
+.section-step-nav button:disabled{opacity:.4;cursor:default}

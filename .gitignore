@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env
+.DS_Store
+backend/.venv/
+backend/__pycache__/
+backend/paperverse/**/__pycache__/
+backend/data/
+data/
+*.py[cod]

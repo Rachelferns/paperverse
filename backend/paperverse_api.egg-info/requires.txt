@@ -1,0 +1,8 @@
+fastapi<1,>=0.115
+uvicorn[standard]<1,>=0.30
+python-multipart>=0.0.9
+pydantic<3,>=2.8
+pymupdf>=1.24
+sympy>=1.13
+celery[redis]<6,>=5.4
+genanki>=0.13
