@@ -11,18 +11,29 @@ class MathSymbol(BaseModel):
 
 
 class EquationStep(BaseModel):
-    step_number: int
-    latex: str
-    explanation: str
+    step_number: str
+    latex: str = ""
+    latex_expression: str = ""
+    explanation: str = ""
+    axiom_or_rule_applied: str = ""
     is_intermediate_derived: bool = False
     sympy_verified: bool = False
 
 
 class DerivationBlock(BaseModel):
     equation_id: str
-    official_latex: str
+    original_latex: str = ""
+    official_latex: str = ""
+    paper_section: str = ""
+    conceptual_summary: str = ""
+    symbol_glossary: list[dict] = Field(default_factory=list)
+    dependencies: list[str] = Field(default_factory=list)
+    step_by_step_derivation: list[dict] = Field(default_factory=list)
+    sympy_verification_script: str = ""
+    notational_notes_or_typos: str = ""
     symbol_dependencies: list[str] = Field(default_factory=list)
     steps: list[EquationStep] = Field(default_factory=list)
+    verification_note: str = ""
 
 
 class VideoStep(BaseModel):

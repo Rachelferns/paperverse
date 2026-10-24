@@ -1,4 +1,4 @@
-const API_ROOT = (import.meta.env.VITE_API_BASE || 'http://localhost:8001/api/v1').replace(/\/$/, '')
+const API_ROOT = (import.meta.env.VITE_API_BASE || 'http://localhost:8000/api/v1').replace(/\/$/, '')
 
 async function readResponse(response) {
   const body = await response.json().catch(() => ({}))

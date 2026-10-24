@@ -14,7 +14,7 @@ def analyze(paper_id: str, job_id: str, file_path: Path) -> None:
         repository.update_job(job_id, "processing", stages[0][0], stages[0][1])
         document = ingest_pdf(file_path)
         repository.update_job(job_id, "processing", stages[1][0], stages[1][1])
-        equations, symbols = explain_equations(document["equations"])
+        equations, symbols = explain_equations(document["equations"], document["markdown"])
         repository.update_job(job_id, "processing", stages[2][0], stages[2][1])
         video_props = make_video_props(equations[0] if equations else None, document["title"])
         repository.update_job(job_id, "processing", stages[3][0], stages[3][1])

@@ -164,13 +164,50 @@ def ingest_pdf(path: Path) -> dict:
         if title_lines:
             title = re.sub(r"\s+", " ", " ".join(title_lines)).strip()
 
-    equations = re.findall(r"\$\$(.+?)\$\$|\\\[(.+?)\\\]", text, flags=re.S)
-    latex = [next(part for part in pair if part).strip() for pair in equations]
+    llm_markdown = ""
+    try:
+        import pymupdf4llm
+        llm_markdown = pymupdf4llm.to_markdown(str(path))
+    except Exception:
+        pass
+
     abstract_match = re.search(r"(?is)abstract\s*[—–:-]?\s*(.+?)(?=index terms|keywords|\n\s*(?:\d+(?:\.\d+)*|[IVX]+|[A-Z])\.\s+[A-Z])", text)
     summary = re.sub(r"\s+", " ", abstract_match.group(1)).strip() if abstract_match else ""
     if not summary:
         paragraphs = [re.sub(r"\s+", " ", p).strip() for p in re.split(r"\n\s*\n", text)]
         summary = next((p for p in paragraphs if len(p) > 180), "")
-    markdown = "\n\n".join(f"<!-- page:{page['page_number']} -->\n{page['text']}" for page in pages)
+
+    markdown = llm_markdown if len(llm_markdown) > 50 else "\n\n".join(f"<!-- page:{page['page_number']} -->\n{page['text']}" for page in pages)
+
+    # Search for LaTeX / display math equations in both markdown and raw text
+    seen_eqs = set()
+    latex = []
+
+    def _add_eq(eq_str: str):
+        cleaned = re.sub(r"\s+", " ", eq_str).strip()
+        if len(cleaned) >= 4 and cleaned not in seen_eqs:
+            seen_eqs.add(cleaned)
+            latex.append(cleaned)
+
+    # 1. Standard LaTeX delimiters
+    for match in re.finditer(r"\$\$(.+?)\$\$|\\\[(.+?)\\\]", markdown, flags=re.S):
+        _add_eq(match.group(1) or match.group(2))
+    for match in re.finditer(r"\$\$(.+?)\$\$|\\\[(.+?)\\\]", text, flags=re.S):
+        _add_eq(match.group(1) or match.group(2))
+
+    # 2. Inline math containing equality or key mathematical operators
+    for match in re.finditer(r"\$([^\$\n]{5,180})\$", markdown):
+        val = match.group(1).strip()
+        if any(op in val for op in ("=", r"\sum", r"\prod", r"\frac", r"\sqrt", "softmax", r"\mathbb", r"\mathcal", r"\alpha", r"\beta", r"\gamma", r"\lambda")):
+            _add_eq(val)
+
+    # 3. Text lines with display equation patterns, e.g. "Attention(Q, K, V) = ... (1)"
+    for line in (text + "\n" + markdown).splitlines():
+        line = line.strip()
+        if re.search(r"(?:Attention|Loss|softmax|\\mathcal\{L\}|argmin|argmax)|=", line, re.I):
+            m = re.match(r"^([A-Za-z\\][A-Za-z0-9_\(\)\{\}\\\^\+\-\*\/\s,=]{4,100}\s*=\s*[^;\n]{3,120})(?:\s*\(([0-9]+)\))?$", line)
+            if m:
+                _add_eq(m.group(1))
+
     return {"markdown": markdown, "text": text, "title": title, "summary": summary[:1800], "pages": pages,
             "headings": [section["title"] for section in sections], "sections": sections, "equations": latex}

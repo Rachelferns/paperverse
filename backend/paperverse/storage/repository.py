@@ -76,12 +76,14 @@ class Repository:
         with self.lock, self.connect() as db:
             db.execute("UPDATE papers SET title=?,markdown_content=?,summary=?,sections_json=? WHERE id=?",
                        (title, markdown, summary, json.dumps(sections), paper_id))
+            db.execute("DELETE FROM equations WHERE paper_id=?", (paper_id,))
+            db.execute("DELETE FROM symbol_glossary WHERE paper_id=?", (paper_id,))
             for equation in equations:
                 db.execute("INSERT OR REPLACE INTO equations VALUES (?,?,?,?,?,?)",
                            (equation["equation_id"], paper_id, equation["official_latex"], equation.get("section_name"),
                             json.dumps(equation), self.now()))
             for index, symbol in enumerate(symbols):
-                db.execute("INSERT INTO symbol_glossary VALUES (?,?,?,?,?)",
+                db.execute("INSERT OR REPLACE INTO symbol_glossary VALUES (?,?,?,?,?)",
                            (f"{paper_id}-{index}", paper_id, symbol["symbol"], symbol["definition"], symbol.get("dimensions")))
             db.execute("INSERT OR REPLACE INTO artifacts VALUES (?,?,?,?,?,?,?)",
                        (f"{paper_id}-artifacts", paper_id, artifacts["diagram_mermaid"], artifacts["python_code"],

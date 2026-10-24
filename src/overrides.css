@@ -41,3 +41,334 @@
 .section-step-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:680px;margin:22px 0;color:#828694;font:9px var(--mono)}
 .section-step-nav button{display:flex;align-items:center;gap:5px;padding:8px 10px;border:1px solid #292d3a;border-radius:5px;background:#11141c;color:#c9c7dc;font:10px 'DM Sans',sans-serif}
 .section-step-nav button:disabled{opacity:.4;cursor:default}
+
+/* Math Explainer Engine Styles */
+.math-explainer-card {
+  margin: 22px 0;
+  border: 1px solid #282a3a;
+  border-radius: 9px;
+  background: linear-gradient(155deg, #12141f, #0d0f17);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+.math-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 18px;
+  border-bottom: 1px solid #1f2230;
+  background: rgba(18, 20, 31, 0.6);
+}
+.math-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.equation-id-label {
+  font: 9px var(--mono);
+  color: #8c8fa1;
+  letter-spacing: 0.5px;
+}
+.sympy-verified-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font: 8px var(--mono);
+  letter-spacing: 0.5px;
+  color: #5ad39d;
+  background: rgba(40, 160, 100, 0.12);
+  border: 1px solid rgba(90, 211, 157, 0.3);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+.math-engine-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font: 8px var(--mono);
+  color: #a79cfa;
+  background: rgba(130, 115, 240, 0.12);
+  border: 1px solid rgba(167, 156, 250, 0.3);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+.math-display-stage {
+  padding: 24px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-x: auto;
+  color: #f1effb;
+  font-size: 20px;
+  background: radial-gradient(ellipse at 50% 50%, rgba(130, 115, 240, 0.06), transparent 70%);
+}
+.math-display-stage .katex-display {
+  margin: 0 !important;
+}
+.math-display-code {
+  display: block;
+  padding: 20px;
+  font: 12px/1.8 var(--mono);
+  color: #d1ccfa;
+  text-align: center;
+  white-space: pre-wrap;
+}
+.math-conceptual-summary {
+  padding: 14px 18px;
+  border-top: 1px solid #1c1f2b;
+  background: rgba(15, 17, 26, 0.7);
+  font-size: 11px;
+  line-height: 1.65;
+  color: #b8bac7;
+}
+.math-conceptual-summary strong {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #dedcf5;
+  margin-bottom: 4px;
+  font-family: var(--mono);
+}
+.math-dependencies {
+  padding: 12px 18px;
+  border-top: 1px solid #1c1f2b;
+  background: rgba(12, 14, 21, 0.5);
+}
+.dep-title {
+  display: block;
+  font: 8px var(--mono);
+  letter-spacing: 0.8px;
+  color: #797c8d;
+  margin-bottom: 7px;
+}
+.dep-chips {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.dep-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 9px;
+  color: #a49edf;
+  background: rgba(90, 80, 160, 0.12);
+  border: 1px solid rgba(130, 120, 200, 0.2);
+  border-radius: 4px;
+  padding: 4px 8px;
+  width: fit-content;
+}
+.math-glossary-section {
+  padding: 14px 18px;
+  border-top: 1px solid #1c1f2b;
+}
+.glossary-header {
+  display: block;
+  font: 8px var(--mono);
+  letter-spacing: 0.8px;
+  color: #797c8d;
+  margin-bottom: 10px;
+}
+.glossary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px;
+}
+.glossary-card {
+  padding: 9px 11px;
+  background: #11131c;
+  border: 1px solid #232736;
+  border-radius: 6px;
+}
+.glossary-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.glossary-symbol {
+  font-size: 13px;
+  color: #e4dfff;
+}
+.glossary-dim {
+  font: 8px var(--mono);
+  color: #e2b968;
+  background: rgba(226, 185, 104, 0.12);
+  border: 1px solid rgba(226, 185, 104, 0.25);
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+.glossary-name {
+  font-size: 10px;
+  font-weight: 550;
+  color: #d1d3df;
+  margin-bottom: 2px;
+}
+.glossary-def {
+  font-size: 8px;
+  line-height: 1.5;
+  color: #8c909e;
+}
+.math-derivation-section {
+  border-top: 1px solid #1f2230;
+}
+.derivation-accordion-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 18px;
+  background: #141723;
+  border: 0;
+  color: #cec9eb;
+  font-size: 10px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.18s;
+}
+.derivation-accordion-toggle:hover {
+  background: #191c2b;
+  color: #f1effb;
+}
+.accordion-chevron {
+  margin-left: auto;
+  transition: transform 0.2s ease;
+  color: #7b8092;
+}
+.derivation-accordion-toggle.open .accordion-chevron {
+  transform: rotate(180deg);
+}
+.derivation-steps-container {
+  overflow: hidden;
+  background: #0d0f17;
+  padding: 0 18px 12px;
+}
+.derivation-step-card {
+  margin-top: 10px;
+  padding: 13px 15px;
+  border: 1px solid #232737;
+  border-radius: 7px;
+  background: #111420;
+}
+.step-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.step-badge {
+  font: 9px var(--mono);
+  font-weight: 600;
+  color: #a399fa;
+  background: rgba(130, 115, 240, 0.15);
+  border: 1px solid rgba(130, 115, 240, 0.3);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+.axiom-badge {
+  font: 8px var(--mono);
+  color: #dfba6d;
+  background: rgba(223, 186, 109, 0.12);
+  border: 1px solid rgba(223, 186, 109, 0.28);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+.step-math {
+  padding: 10px 0;
+  overflow-x: auto;
+  font-size: 14px;
+  color: #e5e3f5;
+}
+.step-math .katex-display {
+  margin: 4px 0 !important;
+}
+.step-code {
+  display: block;
+  font: 10px var(--mono);
+  color: #c9c3f5;
+  background: #171926;
+  padding: 7px 10px;
+  border-radius: 4px;
+  margin: 6px 0;
+}
+.step-explanation {
+  font-size: 9.5px;
+  line-height: 1.6;
+  color: #9da0b1;
+  margin: 6px 0 0;
+}
+.sympy-verification-section {
+  border-top: 1px solid #1c1f2b;
+  background: #0f121a;
+}
+.sympy-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 18px;
+}
+.sympy-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: transparent;
+  border: 0;
+  color: #64cca2;
+  font: 9px var(--mono);
+  cursor: pointer;
+  padding: 0;
+}
+.sympy-toggle-btn:hover {
+  color: #8be5be;
+}
+.copy-script-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #171c26;
+  border: 1px solid #283040;
+  border-radius: 4px;
+  padding: 3px 8px;
+  color: #a2a8b9;
+  font: 8px var(--mono);
+  cursor: pointer;
+}
+.copy-script-btn:hover {
+  color: #e1e3ec;
+  border-color: #434c62;
+}
+.sympy-code-wrap {
+  overflow: hidden;
+  border-top: 1px solid #1c202b;
+  background: #0a0c12;
+  padding: 12px 18px;
+}
+.sympy-code-wrap pre {
+  margin: 0;
+  font: 9px/1.7 var(--mono);
+  color: #8be5be;
+  overflow-x: auto;
+}
+.notational-notes-box {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 12px 18px;
+  border-top: 1px solid #282436;
+  background: rgba(45, 30, 20, 0.25);
+  color: #e5c382;
+  font-size: 9px;
+  line-height: 1.6;
+}
+.notational-notes-box strong {
+  display: block;
+  font: 8px var(--mono);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.notational-notes-box p {
+  margin: 0;
+  color: #c9b48c;
+}
