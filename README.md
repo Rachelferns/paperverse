@@ -16,12 +16,12 @@ In a second terminal:
 ```bash
 cd backend
 python3 -m venv .venv
-source .venv/bin/activate
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -e .
-uvicorn paperverse.main:app --app-dir . --reload --port 8001
+uvicorn paperverse.main:app --app-dir . --reload --port 8000
 ```
 
-Open `http://localhost:5173`. Set `VITE_API_BASE` if the API uses a different URL. The frontend default is `http://localhost:8001/api/v1`.
+Open `http://localhost:5173`. The frontend API default is `http://localhost:8000/api/v1`. Set `VITE_API_BASE` if you run the API on a different URL.
 
 For Redis/Celery mode, set `PAPERVERSE_QUEUE_MODE=celery` and `PAPERVERSE_REDIS_URL`, then run a worker with `celery -A paperverse.queue.celery_app worker --loglevel=INFO`. See [backend/README.md](backend/README.md) for pipeline details and current provider boundaries.
 

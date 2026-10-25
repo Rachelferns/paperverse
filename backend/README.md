@@ -6,10 +6,13 @@ Local-first FastAPI backend. It accepts PDF uploads and arXiv IDs/URLs, extracts
 
 ```bash
 cd backend
-python -m venv .venv && source .venv/bin/activate
+python -m venv .venv
+.venv\Scripts\activate   # Linux/macOS: source .venv/bin/activate
 pip install -e .
 uvicorn paperverse.main:app --reload --port 8000
 ```
+
+The frontend default is `http://localhost:8000/api/v1`. Set `VITE_API_BASE` on the frontend if you change the port.
 
 Set `PAPERVERSE_QUEUE_MODE=celery` and run `celery -A paperverse.queue.celery_app worker --loglevel=INFO` to use Redis/Celery. Set `PAPERVERSE_DATA_DIR` to move local uploads and SQLite data.
 
