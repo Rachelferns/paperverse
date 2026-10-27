@@ -44,6 +44,10 @@ async def upload_paper(background: BackgroundTasks, file: UploadFile = File(...)
     if size == 0:
         target.unlink(missing_ok=True)
         raise HTTPException(400, "The uploaded file is empty.")
+    header = target.read_bytes()[:5]
+    if not header.startswith(b"%PDF"):
+        target.unlink(missing_ok=True)
+        raise HTTPException(415, "Upload a valid PDF file.")
     arxiv_match = re.search(r"(?:arxiv\.org/(?:abs|pdf)/)?(\d{4}\.\d{4,5})", filename)
     title = Path(filename).stem.replace("_", " ")
     repository.create_paper_job(paper_id, job_id, title, filename, arxiv_match.group(1) if arxiv_match else None)
@@ -98,7 +102,7 @@ async def job_events(job_id: str):
             if payload != last:
                 yield f"event: job\ndata: {payload}\n\n"
                 last = payload
-            if current["status"] in ("completed", "failed"): break
+            if current["status"] in ("completed", "partially_completed", "failed"): break
             await asyncio.sleep(0.8)
     return StreamingResponse(stream(), media_type="text/event-stream", headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
 
@@ -129,9 +133,12 @@ def download_anki(paper_id: str):
         import genanki
     except ImportError:
         raise HTTPException(501, "Anki export is unavailable; install backend dependencies.")
+    model = getattr(genanki, "BASIC_MODEL", None) or getattr(genanki, "Basic", None)
+    if model is None:
+        raise HTTPException(501, "This genanki version does not expose a Basic note model.")
     deck = genanki.Deck(abs(hash(paper_id)) % (2**31), paper["paper"]["title"])
     for item in (paper["artifacts"] or {}).get("flashcards", []):
-        deck.add_note(genanki.Note(model=genanki.Basic, fields=[item["question"], item["answer"]], tags=[item.get("tag", "paperverse")]))
+        deck.add_note(genanki.Note(model=model, fields=[item["question"], item["answer"]], tags=[item.get("tag", "paperverse")]))
     out = settings.data_dir / f"{paper_id}.apkg"
     genanki.Package(deck).write_to_file(str(out))
     from fastapi.responses import FileResponse

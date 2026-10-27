@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Play } from 'lucide-react'
 
-const starter = `import numpy as np\n\nQ = np.array([[1., 0.], [0., 1.]])\nK = np.array([[1., 0.], [0., 1.]])\nV = np.array([[2., 1.], [0., 3.]])\nscores = Q @ K.T / np.sqrt(Q.shape[-1])\nweights = np.exp(scores) / np.exp(scores).sum(axis=-1, keepdims=True)\noutput = weights @ V\nprint(np.round(output, 3))`
+const starter = `print("Paste a Python snippet to run it in this browser tab.")`
 const pyodideCdn = 'https://cdn.jsdelivr.net/pyodide/v0.27.7/full/'
 let runtimePromise
 

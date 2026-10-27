@@ -1,13 +1,14 @@
-from typing import Literal
+from typing import Any, Literal
 from pydantic import BaseModel, Field
 
 
 class MathSymbol(BaseModel):
     symbol: str
     name: str
-    dimensions: str = "Unknown"
+    dimensions: str = ""
     definition: str
     first_introduced_sec: str = ""
+    status: Literal["defined", "occurrence"] = "occurrence"
 
 
 class EquationStep(BaseModel):
@@ -23,6 +24,15 @@ class DerivationBlock(BaseModel):
     official_latex: str
     symbol_dependencies: list[str] = Field(default_factory=list)
     steps: list[EquationStep] = Field(default_factory=list)
+    section_name: str = "Extracted equations"
+    page: int | None = None
+    source_text: str = ""
+    verification_note: str = ""
+    equation_number: str | None = None
+    plain_explanation: str = ""
+    intuition: str = ""
+    verification_status: Literal["extracted_only", "partially_checked"] = "extracted_only"
+    explained_symbols: list[dict[str, Any]] = Field(default_factory=list)
 
 
 class VideoStep(BaseModel):
@@ -52,7 +62,7 @@ class StudyKitArtifacts(BaseModel):
 class JobStatus(BaseModel):
     job_id: str
     paper_id: str
-    status: Literal["queued", "processing", "completed", "failed"]
+    status: Literal["queued", "processing", "completed", "partially_completed", "failed"]
     stage: str | None = None
     progress: int = 0
     error: str | None = None

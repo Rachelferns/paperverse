@@ -10,7 +10,11 @@ export default function MermaidPreview({ source }) {
         const { default: mermaid } = await import('mermaid')
         mermaid.initialize({ startOnLoad: false, theme: 'dark', securityLevel: 'strict', flowchart: { curve: 'basis', htmlLabels: false } })
         const id = `paperverse-mermaid-${Math.random().toString(36).slice(2)}`
-        const { svg } = await mermaid.render(id, source || 'flowchart TD\nA[Upload a paper] --> B[Build a study kit]')
+        if (!source || source.startsWith('PAPERVERSE_ARCHITECTURE_UNAVAILABLE')) {
+          if (alive) setError('')
+          return
+        }
+        const { svg } = await mermaid.render(id, source)
         if (alive && target.current) { target.current.innerHTML = svg; setError('') }
       } catch (reason) { if (alive) setError(reason.message || 'Could not render the Mermaid diagram.') }
     }

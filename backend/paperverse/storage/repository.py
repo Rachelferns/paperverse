@@ -69,13 +69,15 @@ class Repository:
         with self.lock, self.connect() as db:
             db.execute("UPDATE jobs SET status=?,stage=?,progress=?,error=?,updated_at=? WHERE id=?",
                        (status, stage, progress, error, self.now(), job_id))
-            if status in ("completed", "failed"):
+            if status in ("completed", "partially_completed", "failed"):
                 db.execute("UPDATE papers SET status=? WHERE id=(SELECT paper_id FROM jobs WHERE id=?)", (status, job_id))
 
     def save_analysis(self, paper_id: str, title: str, markdown: str, summary: str, sections: list[dict], equations: list[dict], symbols: list[dict], artifacts: dict) -> None:
         with self.lock, self.connect() as db:
             db.execute("UPDATE papers SET title=?,markdown_content=?,summary=?,sections_json=? WHERE id=?",
                        (title, markdown, summary, json.dumps(sections), paper_id))
+            db.execute("DELETE FROM equations WHERE paper_id=?", (paper_id,))
+            db.execute("DELETE FROM symbol_glossary WHERE paper_id=?", (paper_id,))
             for equation in equations:
                 db.execute("INSERT OR REPLACE INTO equations VALUES (?,?,?,?,?,?)",
                            (equation["equation_id"], paper_id, equation["official_latex"], equation.get("section_name"),

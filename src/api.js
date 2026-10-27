@@ -1,4 +1,8 @@
-const API_ROOT = (import.meta.env.VITE_API_BASE || 'http://localhost:8001/api/v1').replace(/\/$/, '')
+export const API_ROOT = (import.meta.env.VITE_API_BASE || 'http://localhost:8001/api/v1').replace(/\/$/, '')
+
+function isTerminalJob(job) {
+  return ['completed', 'partially_completed', 'failed'].includes(job?.status)
+}
 
 async function readResponse(response) {
   const body = await response.json().catch(() => ({}))
@@ -49,7 +53,7 @@ export function watchJob(jobId, onUpdate, onError) {
   events.addEventListener('job', event => {
     const job = JSON.parse(event.data)
     onUpdate(job)
-    if (job.status === 'completed' || job.status === 'failed') { finished = true; events.close(); clearInterval(pollTimer) }
+    if (isTerminalJob(job)) { finished = true; events.close(); clearInterval(pollTimer) }
   })
   events.onerror = () => {
     events.close()
@@ -58,7 +62,7 @@ export function watchJob(jobId, onUpdate, onError) {
       try {
         const job = await readResponse(await fetch(`${API_ROOT}/jobs/${jobId}`))
         onUpdate(job)
-        if (job.status === 'completed' || job.status === 'failed') { finished = true; clearInterval(pollTimer); pollTimer = null }
+        if (isTerminalJob(job)) { finished = true; clearInterval(pollTimer); pollTimer = null }
       } catch (error) { onError?.(error) }
     }, 1200)
   }

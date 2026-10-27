@@ -10,3 +10,5 @@ Requires-Dist: pymupdf>=1.24
 Requires-Dist: sympy>=1.13
 Requires-Dist: celery[redis]<6,>=5.4
 Requires-Dist: genanki>=0.13
+Provides-Extra: test
+Requires-Dist: pytest>=8.0; extra == "test"

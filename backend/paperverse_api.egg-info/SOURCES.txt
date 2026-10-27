@@ -21,3 +21,7 @@ paperverse_api.egg-info/SOURCES.txt
 paperverse_api.egg-info/dependency_links.txt
 paperverse_api.egg-info/requires.txt
 paperverse_api.egg-info/top_level.txt
+tests/test_ingestion.py
+tests/test_math_engine.py
+tests/test_orchestrator.py
+tests/test_repository.py

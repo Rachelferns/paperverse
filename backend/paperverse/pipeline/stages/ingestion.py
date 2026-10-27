@@ -132,6 +132,127 @@ def _sections_from_pdf(document, pages: list[dict], full_text: str) -> list[dict
     return sections
 
 
+_PROSE_START = re.compile(
+    r"^(?:the|this|these|those|we|our|a|an|in|for|as|if|when|where|figure|table|section|eq(?:uation)?)\b",
+    re.I,
+)
+_MATHY = re.compile(
+    r"(softmax|attention|argmax|argmin|sqrt|loss|\\frac|\\sum|\\prod|\\sqrt|\\mathcal|\\mathbb|"
+    r"\\operatorname|√|∑|∏|∫|[A-Za-z]_\{?[A-Za-z0-9]+\}?|\^[A-Za-z0-9]|d_k|QK|[A-Z]\s*=\s*[A-Z])",
+    re.I,
+)
+
+
+def unicode_to_latex(value: str) -> str:
+    """Best-effort conversion of PDF unicode math into KaTeX-friendly LaTeX."""
+    text = value.strip()
+    replacements = {
+        "−": "-", "–": "-", "—": "-", "×": r"\times ", "·": r"\cdot ",
+        "≤": r"\leq ", "≥": r"\geq ", "≠": r"\neq ", "≈": r"\approx ",
+        "∈": r"\in ", "→": r"\rightarrow ", "←": r"\leftarrow ",
+        "∑": r"\sum ", "∏": r"\prod ", "∫": r"\int ", "∞": r"\infty ",
+        "α": r"\alpha ", "β": r"\beta ", "γ": r"\gamma ", "δ": r"\delta ",
+        "ε": r"\epsilon ", "θ": r"\theta ", "λ": r"\lambda ", "μ": r"\mu ",
+        "π": r"\pi ", "σ": r"\sigma ", "φ": r"\phi ", "ω": r"\omega ",
+        "ᵀ": r"^{T}",
+    }
+    for source, dest in replacements.items():
+        text = text.replace(source, dest)
+    text = re.sub(r"√\s*\{([^}]+)\}", r"\\sqrt{\1}", text)
+    text = re.sub(r"√\s*([A-Za-z0-9_]+)", r"\\sqrt{\1}", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
+
+
+def _normalize_eq_key(value: str) -> str:
+    return re.sub(r"\s+", "", value).casefold()
+
+
+def _section_for_snippet(sections: list[dict], page: int, snippet: str) -> str:
+    if snippet:
+        for section in sections:
+            if snippet in (section.get("content") or ""):
+                return section["title"]
+    earlier = [section for section in sections if isinstance(section.get("page"), int) and section["page"] <= page]
+    if earlier:
+        return earlier[-1]["title"]
+    return sections[0]["title"] if sections else "Extracted equations"
+
+
+def _looks_like_display_equation(line: str) -> bool:
+    stripped = line.strip()
+    if len(stripped) < 8 or len(stripped) > 180:
+        return False
+    if "=" not in stripped:
+        return False
+    if _PROSE_START.match(stripped):
+        return False
+    if stripped[:1] in {"•", "·", "-", "*", "–"}:
+        return False
+    if stripped.count(" ") > 22:
+        return False
+    numbered = bool(re.search(r"\(\s*[\dA-Za-z.]+\s*\)\s*$", stripped) or re.match(r"^\(\s*[\dA-Za-z.]+\s*\)", stripped))
+    return numbered or bool(_MATHY.search(stripped))
+
+
+def _strip_equation_number(line: str) -> tuple[str, str | None]:
+    match = re.match(r"^\(\s*([\dA-Za-z.]+)\s*\)\s*(.+)$", line)
+    if match:
+        return match.group(2).strip(), match.group(1)
+    match = re.match(r"^(.+?)\s*\(\s*([\dA-Za-z.]+)\s*\)\s*$", line)
+    if match and "=" in match.group(1):
+        return match.group(1).strip(), match.group(2)
+    return line.strip(), None
+
+
+def extract_equations(pages: list[dict], sections: list[dict], full_text: str) -> list[dict]:
+    """Pull display math from LaTeX delimiters and numbered/symbolic text lines."""
+    found: list[dict] = []
+    seen: set[str] = set()
+
+    def add(source: str, page: int, from_latex: bool) -> None:
+        body, number = _strip_equation_number(source)
+        latex = body if from_latex else unicode_to_latex(body)
+        latex = latex.strip().strip("$")
+        if len(latex) < 4:
+            return
+        key = _normalize_eq_key(latex)
+        if key in seen:
+            if number:
+                for item in found:
+                    if _normalize_eq_key(item["official_latex"]) == key and not item.get("equation_number"):
+                        item["equation_number"] = number
+                        item["source_text"] = source.strip()
+            return
+        seen.add(key)
+        found.append({
+            "official_latex": latex,
+            "source_text": source.strip(),
+            "page": page,
+            "section_name": _section_for_snippet(sections, page, source.strip()),
+            "equation_number": number,
+        })
+
+    for page in pages:
+        page_no = page["page_number"]
+        page_text = page.get("text") or ""
+        for match in re.finditer(r"\$\$(.+?)\$\$|\\\[(.+?)\\\]", page_text, flags=re.S):
+            add(next(part for part in match.groups() if part).strip(), page_no, True)
+        lines = [re.sub(r"\s+", " ", raw).strip() for raw in page_text.splitlines() if raw.strip()]
+        for index, line in enumerate(lines):
+            if re.fullmatch(r"\(\s*[\dA-Za-z.]+\s*\)", line) and index and "=" in lines[index - 1]:
+                add(f"{lines[index - 1]} {line}", page_no, False)
+            elif _looks_like_display_equation(line):
+                add(line, page_no, False)
+
+    for match in re.finditer(r"\$\$(.+?)\$\$|\\\[(.+?)\\\]", full_text, flags=re.S):
+        snippet = next(part for part in match.groups() if part).strip()
+        page_no = next((page["page_number"] for page in pages if snippet in (page.get("text") or "")), 1)
+        add(snippet, page_no, True)
+
+    return found[:40]
+
+
 def ingest_pdf(path: Path) -> dict:
     try:
         import pymupdf
@@ -152,9 +273,13 @@ def ingest_pdf(path: Path) -> dict:
         for line in (item.strip() for item in before_abstract.splitlines()):
             if not line:
                 continue
+            if re.match(r"(?i)^(abstract|introduction|keywords|index terms)\b", line):
+                break
             if re.search(r"\b(department|university|institute|email|@|india)\b", line, re.I):
                 break
-            if re.search(r"\b(and|et al\.)\b", line) and re.search(r"[A-Z][a-z]+\s+[A-Z][a-z]+", line):
+            if re.search(r"\bet al\.?\b", line, re.I):
+                break
+            if re.search(r"\b(and)\b", line) and re.search(r"[A-Z][a-z]+\s+[A-Z][a-z]+", line):
                 break
             if len(line) > 105:
                 break
@@ -164,8 +289,7 @@ def ingest_pdf(path: Path) -> dict:
         if title_lines:
             title = re.sub(r"\s+", " ", " ".join(title_lines)).strip()
 
-    equations = re.findall(r"\$\$(.+?)\$\$|\\\[(.+?)\\\]", text, flags=re.S)
-    latex = [next(part for part in pair if part).strip() for pair in equations]
+    equations = extract_equations(pages, sections, text)
     abstract_match = re.search(r"(?is)abstract\s*[—–:-]?\s*(.+?)(?=index terms|keywords|\n\s*(?:\d+(?:\.\d+)*|[IVX]+|[A-Z])\.\s+[A-Z])", text)
     summary = re.sub(r"\s+", " ", abstract_match.group(1)).strip() if abstract_match else ""
     if not summary:
@@ -173,4 +297,4 @@ def ingest_pdf(path: Path) -> dict:
         summary = next((p for p in paragraphs if len(p) > 180), "")
     markdown = "\n\n".join(f"<!-- page:{page['page_number']} -->\n{page['text']}" for page in pages)
     return {"markdown": markdown, "text": text, "title": title, "summary": summary[:1800], "pages": pages,
-            "headings": [section["title"] for section in sections], "sections": sections, "equations": latex}
+            "headings": [section["title"] for section in sections], "sections": sections, "equations": equations}
